@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import apiClient from "../../utils/apiClient";
 import { useAuthStore } from "../../store/authStore";
+import { toast } from "react-toastify";
 
 export type LoginRequest = {
   email: string;
@@ -57,6 +58,7 @@ export const useLogin = () => {
       setTimeout(() => navigate("/"), 100);
     },
     onError: (error: any) => {
+      toast.error("Login failed", { position: "top-center" });
       console.error("Login failed:", error);
     },
   });

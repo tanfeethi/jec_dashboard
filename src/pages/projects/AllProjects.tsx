@@ -43,7 +43,7 @@ const AllProjects = () => {
           <button
             onClick={() =>
               navigate(`/projects/edit/${record.id}`, {
-                state: { blog: record },
+                state: { project: record },
               })
             }
             className="group relative inline-flex items-center justify-center w-9  text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"

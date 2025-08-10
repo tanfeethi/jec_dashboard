@@ -18,6 +18,7 @@ import UpdateFaq from "../pages/faqs/UpdateFaq";
 import UpdateStaticPages from "../pages/staticPages/UpdateStaticPages";
 import UpdateSettings from "../pages/settings/UpdateSettings";
 import AddProjects from "../pages/projects/AddProjects";
+import UpdateProject from "../pages/projects/UpdateProjects";
 
 // Lazy load all pages
 const Login = lazy(() => import("../pages/login/Login"));
@@ -82,6 +83,7 @@ const AppRouter = () => {
 
             <Route path="projects" element={<AllProjects />} />
             <Route path="projects/add" element={<AddProjects />} />
+            <Route path="projects/edit/:id" element={<UpdateProject />} />
 
             <Route path="static-pages" element={<AllStaticPages />} />
             <Route path="static-pages/edit" element={<UpdateStaticPages />} />
