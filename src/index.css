@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --mainColor: #1f6eff;
+    --secondaryColor: #0d47a1;
+  }
+}
