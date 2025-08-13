@@ -6,7 +6,7 @@ import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import useDeleteBlog from "../../hooks/blogs/useDeleteBlog";
 
-const AllServices = () => {
+const AllBlogs = () => {
   const [page, setPage] = useState(1);
   const { data: blogsData, isLoading } = useFetchBlogs(page);
   const { mutate: deleteBlogMutate, isPending } = useDeleteBlog();
@@ -132,4 +132,4 @@ const AllServices = () => {
   );
 };
 
-export default AllServices;
+export default AllBlogs;

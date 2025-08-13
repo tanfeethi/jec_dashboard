@@ -34,10 +34,20 @@ const UpdateTestimonials = lazy(
   () => import("../pages/testimonials/UpdateTestimonials")
 );
 
+// Clients
+const AllClients = lazy(() => import("../pages/clients/AllClients"));
+const AddClient = lazy(() => import("../pages/clients/AddClient"));
+const UpdateClient = lazy(() => import("../pages/clients/UpdateClient"));
+
 // Reviews
 const AllReviews = lazy(() => import("../pages/reviews/AllReviews"));
 const AddReviews = lazy(() => import("../pages/reviews/AddReviews"));
 const UpdateReview = lazy(() => import("../pages/reviews/UpdateReview"));
+
+// Events
+const AllEvents = lazy(() => import("../pages/events/AllEvents"));
+const AddEvent = lazy(() => import("../pages/events/AddEvent"));
+const UpdateEvent = lazy(() => import("../pages/events/UpdateEvent"));
 
 // FAQs
 const AllFaqs = lazy(() => import("../pages/faqs/AllFaqs"));
@@ -107,10 +117,20 @@ const AppRouter = () => {
               element={<UpdateTestimonials />}
             />
 
+            {/* Clients */}
+            <Route path="clients" element={<AllClients />} />
+            <Route path="clients/add" element={<AddClient />} />
+            <Route path="clients/edit/:id" element={<UpdateClient />} />
+
             {/* Reviews */}
             <Route path="reviews" element={<AllReviews />} />
             <Route path="reviews/add" element={<AddReviews />} />
             <Route path="reviews/edit/:id" element={<UpdateReview />} />
+
+            {/* Events */}
+            <Route path="events" element={<AllEvents />} />
+            <Route path="events/add" element={<AddEvent />} />
+            <Route path="events/edit/:id" element={<UpdateEvent />} />
 
             {/* FAQs */}
             <Route path="faqs" element={<AllFaqs />} />
