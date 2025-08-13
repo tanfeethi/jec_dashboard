@@ -11,6 +11,7 @@ import {
   FileTextOutlined,
   SettingOutlined,
   LogoutOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { NavLink, useNavigate } from "react-router";
 import { useAuthStore } from "../../store/authStore";
@@ -66,6 +67,11 @@ const Sidebar = () => {
       key: "/static-pages",
       icon: <FileTextOutlined />,
       label: "Static Pages",
+    },
+    {
+      key: "/teams",
+      icon: <TeamOutlined />,
+      label: "Teams",
     },
     {
       key: "/settings",

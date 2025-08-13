@@ -1,18 +1,14 @@
-import { useEffect, useState } from "react";
-import { Form, Input, Button, Typography, message, Select } from "antd";
+import { useState } from "react";
+import { Form, Input, Button, Typography, message } from "antd";
 import type { UploadFile } from "antd";
 import CustomUpload from "../../components/reuse/CustomUpload";
 import Loader from "../../components/reuse/Loader";
 import QuillEditor from "../../components/reuse/QuillEditor";
-import { useLocation, useParams } from "react-router";
-import useUpdateBlog from "../../hooks/blogs/useUpdateBlog";
+import useAddTeamMember from "../../hooks/teams/useAddTeam";
 
 const { Title } = Typography;
 
-const UpdateBlog = () => {
-  const { id } = useParams();
-  const { state } = useLocation();
-
+const AddTeam = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [textEn, setTextEn] = useState("");
@@ -20,11 +16,11 @@ const UpdateBlog = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const {
-    mutate: UpdateBlogMutate,
+    mutate: addTeamMutate,
     isError,
     error,
     isPending,
-  } = useUpdateBlog();
+  } = useAddTeamMember();
 
   const isEmptyHtml = (html: string) => {
     const div = document.createElement("div");
@@ -41,54 +37,21 @@ const UpdateBlog = () => {
     }
 
     const payload = {
-      id: Number(id),
-      values: {
-        title_en: values.title_en,
-        title_ar: values.title_ar,
-        text_en: textEn,
-        text_ar: textAr,
-        icon: fileList[0]?.originFileObj || null,
-        status: values.status,
-      },
+      name_en: values.name_en,
+      name_ar: values.name_ar,
+      position_en: values.position_en,
+      position_ar: values.position_ar,
+      text_en: textEn,
+      text_ar: textAr,
+      image: fileList[0]?.originFileObj || null,
     };
 
-    UpdateBlogMutate(payload);
+    addTeamMutate(payload);
   };
 
   const onFinishFailed = () => {
     setSubmitted(true);
   };
-
-  useEffect(() => {
-    if (state?.blog) {
-      const { title, text, background, status } = state.blog;
-
-      // Set text editors
-      setTextEn(text?.en || "");
-      setTextAr(text?.ar || "");
-
-      // Set form fields
-      form.setFieldsValue({
-        title_en: title?.en || "",
-        title_ar: title?.ar || "",
-        status: status ?? 0,
-      });
-
-      // Preload uploaded image
-      if (background) {
-        const initialFileList = [
-          {
-            uid: "-1",
-            name: "existing-image.jpg",
-            status: "done",
-            url: background,
-          } as UploadFile,
-        ];
-        setFileList(initialFileList);
-        form.setFieldsValue({ background: initialFileList });
-      }
-    }
-  }, [state, form]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 w-full">
@@ -111,10 +74,10 @@ const UpdateBlog = () => {
             </svg>
           </div>
           <Title level={2} className="!text-slate-800 !mb-2">
-            Update Blog
+            Add New Team
           </Title>
           <p className="text-slate-600">
-            Update blog with multilingual support
+            Create a new team with multilingual support
           </p>
         </div>
 
@@ -133,25 +96,22 @@ const UpdateBlog = () => {
               onFinishFailed={onFinishFailed}
               className="space-y-6"
             >
-              {/* Title Fields */}
+              {/* Name Fields */}
               <div className="grid md:grid-cols-2 gap-6">
                 <Form.Item
                   label={
                     <span className="text-slate-700 font-medium">
-                      Title (English)
+                      Name (English)
                     </span>
                   }
-                  name="title_en"
+                  name="name_en"
                   rules={[
-                    {
-                      required: true,
-                      message: "Please enter title in English",
-                    },
+                    { required: true, message: "Please enter name in English" },
                   ]}
                   className="!mb-0"
                 >
                   <Input
-                    placeholder="Enter title in English"
+                    placeholder="Enter name in English"
                     className="!rounded-lg !border-slate-300 hover:!border-blue-400 focus:!border-blue-500 !py-3"
                   />
                 </Form.Item>
@@ -159,20 +119,62 @@ const UpdateBlog = () => {
                 <Form.Item
                   label={
                     <span className="text-slate-700 font-medium">
-                      Title (Arabic)
+                      Name (Arabic)
                     </span>
                   }
-                  name="title_ar"
+                  name="name_ar"
+                  rules={[
+                    { required: true, message: "Please enter name in Arabic" },
+                  ]}
+                  className="!mb-0"
+                >
+                  <Input
+                    placeholder="Enter name in Arabic"
+                    className="!rounded-lg !border-slate-300 hover:!border-blue-400 focus:!border-blue-500 !py-3"
+                  />
+                </Form.Item>
+              </div>
+
+              {/* Position Fields */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <Form.Item
+                  label={
+                    <span className="text-slate-700 font-medium">
+                      Position (English)
+                    </span>
+                  }
+                  name="position_en"
                   rules={[
                     {
                       required: true,
-                      message: "Please enter title in Arabic",
+                      message: "Please enter position in English",
                     },
                   ]}
                   className="!mb-0"
                 >
                   <Input
-                    placeholder="Enter title in Arabic"
+                    placeholder="Enter position in English"
+                    className="!rounded-lg !border-slate-300 hover:!border-blue-400 focus:!border-blue-500 !py-3"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label={
+                    <span className="text-slate-700 font-medium">
+                      Position (Arabic)
+                    </span>
+                  }
+                  name="position_ar"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter position in Arabic",
+                    },
+                  ]}
+                  className="!mb-0"
+                >
+                  <Input
+                    placeholder="Enter position in Arabic"
                     className="!rounded-lg !border-slate-300 hover:!border-blue-400 focus:!border-blue-500 !py-3"
                   />
                 </Form.Item>
@@ -183,7 +185,7 @@ const UpdateBlog = () => {
                 <Form.Item
                   label={
                     <span className="text-slate-700 font-medium">
-                      Description (English)
+                      Text (English)
                     </span>
                   }
                   required
@@ -203,7 +205,7 @@ const UpdateBlog = () => {
                 <Form.Item
                   label={
                     <span className="text-slate-700 font-medium">
-                      Description (Arabic)
+                      Text (Arabic)
                     </span>
                   }
                   required
@@ -221,37 +223,17 @@ const UpdateBlog = () => {
                 </Form.Item>
               </div>
 
-              <Form.Item
-                label={
-                  <span className="text-slate-700 font-medium">status</span>
-                }
-                name="status"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the status",
-                  },
-                ]}
-                initialValue={0}
-                className="mb-4 "
-              >
-                <Select>
-                  <Select.Option value={1}>Active</Select.Option>
-                  <Select.Option value={0}>Inactive</Select.Option>
-                </Select>
-              </Form.Item>
-
               {/* Upload */}
               <div className="bg-white rounded-xl p-6 border border-slate-200">
                 <Form.Item
                   label={
                     <span className="text-slate-700 font-medium text-lg">
-                      Blog Icon
+                      Team Image
                     </span>
                   }
-                  name="background"
+                  name="image"
                   rules={[
-                    { required: true, message: "Please upload an icon image" },
+                    { required: true, message: "Please upload a team image" },
                   ]}
                   className="!mb-0"
                 >
@@ -294,7 +276,7 @@ const UpdateBlog = () => {
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                         />
                       </svg>
-                      Update Blog
+                      Create Team
                     </span>
                   </Button>
                 </Form.Item>
@@ -314,4 +296,4 @@ const UpdateBlog = () => {
   );
 };
 
-export default UpdateBlog;
+export default AddTeam;

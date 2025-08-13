@@ -3,39 +3,68 @@ import { Navigate, Route, Routes } from "react-router";
 import { Spin } from "antd";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedLayout from "../components/layout/ProtectedLayout";
-import AddServices from "../pages/services/AddServices";
-import AddSliders from "../pages/sliders/AddSliders";
-import AddBlog from "../pages/blogs/AddBlog";
-import AddTestimonials from "../pages/testimonials/AddTestimonials";
-import AddReviews from "../pages/reviews/AddReviews";
-import AddFaq from "../pages/faqs/AddFaq";
-import UpdateService from "../pages/services/UpdateService";
-import UpdateSlider from "../pages/sliders/UpdateSlider";
-import UpdateBlog from "../pages/blogs/UpdateBlog";
-import UpdateTestimonials from "../pages/testimonials/UpdateTestimonials";
-import UpdateReview from "../pages/reviews/UpdateReview";
-import UpdateFaq from "../pages/faqs/UpdateFaq";
-import UpdateStaticPages from "../pages/staticPages/UpdateStaticPages";
-import UpdateSettings from "../pages/settings/UpdateSettings";
-import AddProjects from "../pages/projects/AddProjects";
-import UpdateProject from "../pages/projects/UpdateProjects";
 
 // Lazy load all pages
 const Login = lazy(() => import("../pages/login/Login"));
 const Home = lazy(() => import("../pages/home/Home"));
+
+// Blogs
 const AllBlogs = lazy(() => import("../pages/blogs/AllBlogs"));
+const AddBlog = lazy(() => import("../pages/blogs/AddBlog"));
+const UpdateBlog = lazy(() => import("../pages/blogs/UpdateBlog"));
+
+// Services
 const AllServices = lazy(() => import("../pages/services/AllServices"));
+const AddServices = lazy(() => import("../pages/services/AddServices"));
+const UpdateService = lazy(() => import("../pages/services/UpdateService"));
+
+// Sliders
 const AllSliders = lazy(() => import("../pages/sliders/AllSliders"));
+const AddSliders = lazy(() => import("../pages/sliders/AddSliders"));
+const UpdateSlider = lazy(() => import("../pages/sliders/UpdateSlider"));
+
+// Testimonials
 const AllTestimonials = lazy(
   () => import("../pages/testimonials/AllTestimonials")
 );
+const AddTestimonials = lazy(
+  () => import("../pages/testimonials/AddTestimonials")
+);
+const UpdateTestimonials = lazy(
+  () => import("../pages/testimonials/UpdateTestimonials")
+);
+
+// Reviews
 const AllReviews = lazy(() => import("../pages/reviews/AllReviews"));
+const AddReviews = lazy(() => import("../pages/reviews/AddReviews"));
+const UpdateReview = lazy(() => import("../pages/reviews/UpdateReview"));
+
+// FAQs
 const AllFaqs = lazy(() => import("../pages/faqs/AllFaqs"));
+const AddFaq = lazy(() => import("../pages/faqs/AddFaq"));
+const UpdateFaq = lazy(() => import("../pages/faqs/UpdateFaq"));
+
+// Projects
 const AllProjects = lazy(() => import("../pages/projects/AllProjects"));
+const AddProjects = lazy(() => import("../pages/projects/AddProjects"));
+const UpdateProject = lazy(() => import("../pages/projects/UpdateProjects"));
+
+// Static Pages
 const AllStaticPages = lazy(
   () => import("../pages/staticPages/AllStaticPages")
 );
+const UpdateStaticPages = lazy(
+  () => import("../pages/staticPages/UpdateStaticPages")
+);
+
+// Teams
+const AllTeams = lazy(() => import("../pages/teams/AllTeams"));
+const AddTeam = lazy(() => import("../pages/teams/AddTeam"));
+const UpdateTeam = lazy(() => import("../pages/teams/UpdateTeam"));
+
+// Settings
 const AllSettings = lazy(() => import("../pages/settings/AllSettings"));
+const UpdateSettings = lazy(() => import("../pages/settings/UpdateSettings"));
 
 const Loading = () => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
@@ -54,18 +83,23 @@ const AppRouter = () => {
         <Route element={<ProtectedLayout />}>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
+
+            {/* Blogs */}
             <Route path="blogs" element={<AllBlogs />} />
             <Route path="blogs/add" element={<AddBlog />} />
             <Route path="blogs/edit/:id" element={<UpdateBlog />} />
 
+            {/* Services */}
             <Route path="services" element={<AllServices />} />
             <Route path="services/add" element={<AddServices />} />
             <Route path="services/edit/:id" element={<UpdateService />} />
 
+            {/* Sliders */}
             <Route path="sliders" element={<AllSliders />} />
             <Route path="sliders/add" element={<AddSliders />} />
             <Route path="sliders/edit/:id" element={<UpdateSlider />} />
 
+            {/* Testimonials */}
             <Route path="testimonials" element={<AllTestimonials />} />
             <Route path="testimonials/add" element={<AddTestimonials />} />
             <Route
@@ -73,21 +107,31 @@ const AppRouter = () => {
               element={<UpdateTestimonials />}
             />
 
+            {/* Reviews */}
             <Route path="reviews" element={<AllReviews />} />
             <Route path="reviews/add" element={<AddReviews />} />
             <Route path="reviews/edit/:id" element={<UpdateReview />} />
 
+            {/* FAQs */}
             <Route path="faqs" element={<AllFaqs />} />
             <Route path="faqs/add" element={<AddFaq />} />
             <Route path="faqs/edit/:id" element={<UpdateFaq />} />
 
+            {/* Projects */}
             <Route path="projects" element={<AllProjects />} />
             <Route path="projects/add" element={<AddProjects />} />
             <Route path="projects/edit/:id" element={<UpdateProject />} />
 
+            {/* Static Pages */}
             <Route path="static-pages" element={<AllStaticPages />} />
             <Route path="static-pages/edit" element={<UpdateStaticPages />} />
 
+            {/* Teams */}
+            <Route path="teams" element={<AllTeams />} />
+            <Route path="teams/add" element={<AddTeam />} />
+            <Route path="teams/edit/:id" element={<UpdateTeam />} />
+
+            {/* Settings */}
             <Route path="settings" element={<AllSettings />} />
             <Route path="settings/edit" element={<UpdateSettings />} />
           </Route>
