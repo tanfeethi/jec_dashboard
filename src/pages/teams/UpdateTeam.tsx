@@ -5,20 +5,21 @@ import CustomUpload from "../../components/reuse/CustomUpload";
 import Loader from "../../components/reuse/Loader";
 import QuillEditor from "../../components/reuse/QuillEditor";
 import { useParams, useLocation } from "react-router";
+import useUpdateTeam from "../../hooks/teams/useUpdateTeam";
 
 const { Title } = Typography;
 
 const UpdateTeam = () => {
-  const [form] = Form.useForm();
   const { id } = useParams<{ id: string }>();
   const { state } = useLocation();
+  const [form] = Form.useForm();
+  const { mutate, isPending } = useUpdateTeam();
   const teamData = state.team;
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [textEn, setTextEn] = useState("");
   const [textAr, setTextAr] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [isPending, setIsPending] = useState(false);
 
   const isEmptyHtml = (html: string) => {
     const div = document.createElement("div");
@@ -40,14 +41,16 @@ const UpdateTeam = () => {
       setTextAr(teamData.text?.ar || "");
 
       if (teamData.image) {
-        setFileList([
+        const initialFileList = [
           {
             uid: "-1",
-            name: "current-image.png",
+            name: "existing-image.jpg",
             status: "done",
             url: teamData.image,
           } as UploadFile,
-        ]);
+        ];
+        setFileList(initialFileList);
+        form.setFieldsValue({ image: initialFileList });
       }
     }
   }, [teamData, form]);
@@ -72,6 +75,11 @@ const UpdateTeam = () => {
     };
 
     console.log("Update payload:", payload);
+    const teamId = Number(id);
+    mutate({
+      teamId,
+      values: payload,
+    });
   };
 
   const onFinishFailed = () => {
