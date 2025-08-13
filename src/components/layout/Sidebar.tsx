@@ -13,6 +13,8 @@ import {
   LogoutOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
+import { GoPerson } from "react-icons/go";
+import { MdEvent } from "react-icons/md";
 import { NavLink, useNavigate } from "react-router";
 import { useAuthStore } from "../../store/authStore";
 
@@ -59,6 +61,11 @@ const Sidebar = () => {
       label: "Faqs",
     },
     {
+      key: "/clients",
+      icon: <GoPerson />,
+      label: "Clients",
+    },
+    {
       key: "/projects",
       icon: <ProjectOutlined />,
       label: "Projects",
@@ -72,6 +79,11 @@ const Sidebar = () => {
       key: "/teams",
       icon: <TeamOutlined />,
       label: "Teams",
+    },
+    {
+      key: "/events",
+      icon: <MdEvent />,
+      label: "Events",
     },
     {
       key: "/settings",
