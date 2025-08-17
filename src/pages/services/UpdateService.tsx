@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import { Form, Input, Button, Typography } from "antd";
+import { Form, Input, Button, Typography, Select } from "antd";
 import type { UploadFile } from "antd";
 import CustomUpload from "../../components/reuse/CustomUpload";
 import Loader from "../../components/reuse/Loader";
 import { useLocation, useParams } from "react-router";
 import useUpdateService from "../../hooks/services/useUpdateService";
 import QuillEditor from "../../components/reuse/QuillEditor";
+import { useFetchServices } from "../../hooks/services/useFetchServices";
 
 const { Title } = Typography;
 
 const UpdateService = () => {
   const { id } = useParams();
   const { state } = useLocation();
-  console.log(state.service.icon);
+  const { data: servicesData } = useFetchServices();
+
+  const serviceTypes = servicesData?.map((service) => service.type);
 
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>(
@@ -37,13 +40,14 @@ const UpdateService = () => {
 
   useEffect(() => {
     if (state?.service) {
-      const { title, text, icon } = state.service;
+      const { title, text, icon, type } = state.service;
 
       form.setFieldsValue({
         title_en: title?.en || "",
         title_ar: title?.ar || "",
         text_en: text?.en || "",
         text_ar: text?.ar || "",
+        type: type || "",
       });
 
       // Optional: Preload the uploaded image if you have a preview URL
@@ -74,6 +78,7 @@ const UpdateService = () => {
         text_en: values.text_en,
         text_ar: values.text_ar,
         icon: iconFile,
+        type: values.type,
       },
     });
   };
@@ -199,6 +204,27 @@ const UpdateService = () => {
                   />
                 </Form.Item>
               </div>
+
+              <Form.Item
+                label={
+                  <span className="text-slate-700 font-medium">
+                    Service Type
+                  </span>
+                }
+                name="type"
+                rules={[
+                  { required: true, message: "Please select a service type" },
+                ]}
+                className="mb-4"
+              >
+                <Select placeholder="Select service type">
+                  {serviceTypes?.map((type: string, index: number) => (
+                    <Select.Option key={index} value={type}>
+                      {type}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
 
               {/* Upload */}
               <div className="bg-white rounded-xl p-6 border border-slate-200">

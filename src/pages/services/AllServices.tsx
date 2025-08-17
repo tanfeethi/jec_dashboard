@@ -18,6 +18,13 @@ const AllServices = () => {
       key: "id",
     },
     {
+      title: "Type",
+      key: "type",
+      render: (_: any, record: any) => (
+        <span className="text-slate-700 font-medium">{record.type}</span>
+      ),
+    },
+    {
       title: "Title [AR]",
       key: "titleAr",
       render: (_: any, record: any) => (

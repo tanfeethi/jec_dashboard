@@ -11,6 +11,7 @@ export interface IServices {
   title: ILocals;
   text: ILocals;
   icon: string;
+  type: string;
 }
 
 export interface IServicesResponse {

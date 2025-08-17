@@ -1,16 +1,21 @@
 import { useState } from "react";
-import { Form, Input, Button, Typography } from "antd";
+import { Form, Input, Button, Typography, Select } from "antd";
 import type { UploadFile } from "antd";
 import CustomUpload from "../../components/reuse/CustomUpload";
 import useAddService from "../../hooks/services/useAddService";
 import Loader from "../../components/reuse/Loader";
 import QuillEditor from "../../components/reuse/QuillEditor";
+import { useFetchServices } from "../../hooks/services/useFetchServices";
 
 const { Title } = Typography;
 
 const AddServices = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const { data: servicesData } = useFetchServices();
+
+  const serviceTypes = servicesData?.map((service) => service.type);
+
   const {
     mutate: AddServiceMutate,
     isError,
@@ -160,6 +165,27 @@ const AddServices = () => {
                   />
                 </Form.Item>
               </div>
+
+              <Form.Item
+                label={
+                  <span className="text-slate-700 font-medium">
+                    Service Type
+                  </span>
+                }
+                name="type"
+                rules={[
+                  { required: true, message: "Please select a service type" },
+                ]}
+                className="mb-4"
+              >
+                <Select placeholder="Select service type">
+                  {serviceTypes?.map((type: string, index: number) => (
+                    <Select.Option key={index} value={type}>
+                      {type}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
 
               {/* Upload */}
               <div className="bg-white rounded-xl p-6 border border-slate-200">

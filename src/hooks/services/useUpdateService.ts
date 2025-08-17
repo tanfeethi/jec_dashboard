@@ -12,6 +12,7 @@ export interface UpdateServicePayload {
     text_en: string;
     text_ar: string;
     icon?: File | null;
+    type: string;
   };
 }
 
@@ -28,6 +29,7 @@ const updateService = async (
   formData.append("title[ar]", data.values.title_ar);
   formData.append("text[en]", data.values.text_en);
   formData.append("text[ar]", data.values.text_ar);
+  formData.append("type", data.values.type);
 
   if (data.values.icon) {
     formData.append("icon", data.values.icon);
