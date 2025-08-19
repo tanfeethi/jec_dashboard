@@ -1,68 +1,63 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import FeaturesContainer from "../../components/reuse/FeaturesContainer";
 import TableComponent from "../../components/reuse/TableComponent";
-import { useFetchServices } from "../../hooks/services/useFetchServices";
-import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-import useDeleteService from "../../hooks/services/useDeleteService";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  useFetchServicesDetails,
+  type IServiceDetail,
+} from "../../hooks/serviceDetails/useFetchServicesDetails";
+import useDeleteServiceDetails from "../../hooks/serviceDetails/useDeleteServiceDetails";
 
-const AllServices = () => {
+const AllServicesDetails = () => {
   const navigate = useNavigate();
-  const { data: servicesData, isLoading } = useFetchServices();
+  const { id } = useParams();
 
-  const { mutate: DeleteServiceMutate, isPending } = useDeleteService();
+  const { data: servicesDetailsData, isLoading } = useFetchServicesDetails(
+    Number(id)
+  );
+
+  const { mutate: DeleteServiceDetailsMutate, isPending } =
+    useDeleteServiceDetails();
 
   const columns = [
     {
       title: "ID",
-      dataIndex: "id",
       key: "id",
+      render: (_: any, record: IServiceDetail) => (
+        <span className="text-slate-700 font-medium">{record.id}</span>
+      ),
     },
     {
-      title: "Type",
-      key: "type",
-      render: (_: any, record: any) => (
-        <span className="text-slate-700 font-medium">{record.type}</span>
+      title: "Service ID",
+      key: "service_id",
+      render: (_: any, record: IServiceDetail) => (
+        <span className="text-slate-700 font-medium">{record.service_id}</span>
       ),
     },
     {
       title: "Title [AR]",
       key: "titleAr",
-      render: (_: any, record: any) => (
+      render: (_: any, record: IServiceDetail) => (
         <span className="text-slate-700 font-medium">{record.title?.ar}</span>
       ),
     },
     {
       title: "Title [EN]",
       key: "titleAr",
-      render: (_: any, record: any) => (
+      render: (_: any, record: IServiceDetail) => (
         <span className="text-slate-700 font-medium">{record.title?.en}</span>
       ),
     },
     {
       title: "Actions",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: any, record: IServiceDetail) => (
         <div className="flex items-center gap-3">
-          <button
-            onClick={() =>
-              navigate(`/serviceDetails/${record.id}`, {
-                state: { service: record },
-              })
-            }
-            className="group relative inline-flex items-center justify-center w-9  text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-          >
-            <EyeOutlined
-              title="Show Details"
-              className="text-base group-hover:scale-110 transition-transform duration-200 cursor-pointer"
-            />
-          </button>
-
           {/* Edit Button */}
-
           <button
             onClick={() =>
-              navigate(`/services/edit/${record.id}`, {
-                state: { service: record },
+              navigate(`/updateserviceDetails/${record.id}`, {
+                state: { servicedetails: record },
               })
             }
             className="group relative inline-flex items-center justify-center w-9  text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
@@ -72,7 +67,7 @@ const AllServices = () => {
 
           {/* Delete Button */}
           <button
-            onClick={() => DeleteServiceMutate(record.id)}
+            onClick={() => DeleteServiceDetailsMutate(record.id)}
             className="group relative inline-flex items-center justify-center w-9 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
           >
             <DeleteOutlined className="text-base group-hover:scale-110 transition-transform duration-200" />
@@ -107,19 +102,19 @@ const AllServices = () => {
                   </svg>
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 tracking-tight">
-                  All Services
+                  All Services Details
                 </h2>
               </div>
               <button
                 type="button"
                 className=" bg-gradient-to-br from-[var(--mainColor)] to-[var(--secondaryColor)] text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700 transition cursor-pointer"
-                onClick={() => navigate("add")}
+                onClick={() => navigate(`/addserviceDetails/${id}`)}
               >
-                Add Service
+                Add Service Details
               </button>
             </div>
             <p className="text-slate-600 text-sm font-medium">
-              Manage and organize your service listings.
+              Manage and organize your services Details listings.
             </p>
           </div>
         </div>
@@ -130,9 +125,7 @@ const AllServices = () => {
           <div className="relative p-8">
             <TableComponent
               columns={columns}
-              data={(servicesData || [])
-                .slice()
-                .sort((a, b) => a.type.localeCompare(b.type))}
+              data={servicesDetailsData?.service_details || []}
               loading={isLoading || isPending}
             />
           </div>
@@ -142,4 +135,4 @@ const AllServices = () => {
   );
 };
 
-export default AllServices;
+export default AllServicesDetails;

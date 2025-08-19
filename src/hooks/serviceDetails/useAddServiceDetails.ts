@@ -5,12 +5,12 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 export interface AddServicePayload {
+  service_id: number;
   title_en: string;
   title_ar: string;
-  text_en: string;
-  text_ar: string;
-  type: string;
-  icon: File | null;
+  description_en: string;
+  description_ar: string;
+  images: File[] | null;
 }
 
 export interface ServiceErrorResponse {
@@ -18,7 +18,7 @@ export interface ServiceErrorResponse {
   error: string;
 }
 
-const createService = async (
+const createServiceDetails = async (
   data: AddServicePayload
 ): Promise<{ success: boolean }> => {
   const formData = new FormData();
@@ -26,19 +26,24 @@ const createService = async (
   // Use the exact field names your backend expects
   formData.append("title[en]", data.title_en);
   formData.append("title[ar]", data.title_ar);
-  formData.append("text[en]", data.text_en);
-  formData.append("text[ar]", data.text_ar);
-  formData.append("type", data.type);
+  formData.append("description[en]", data.description_en);
+  formData.append("description[ar]", data.description_ar);
+  formData.append("service_id", data.service_id.toString());
 
-  if (data.icon) {
-    formData.append("icon", data.icon);
+  if (data.images) {
+    data.images.forEach((file) => {
+      formData.append("images[]", file);
+    });
   }
 
-  const response = await apiClient.post("/api/dashboard/services", formData);
+  const response = await apiClient.post(
+    "/api/dashboard/service-details",
+    formData
+  );
   return response.data;
 };
 
-const useAddService = () => {
+const useAddServiceDetails = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -47,11 +52,11 @@ const useAddService = () => {
     AxiosError<ServiceErrorResponse>,
     AddServicePayload
   >({
-    mutationFn: createService,
+    mutationFn: createServiceDetails,
     onSuccess: () => {
       toast.success("Service added successfully", { position: "top-center" });
       navigate("/services");
-      queryClient.invalidateQueries({ queryKey: ["services"] });
+      queryClient.invalidateQueries({ queryKey: ["serviceDetails"] });
     },
     onError: (error) => {
       console.error(
@@ -62,4 +67,4 @@ const useAddService = () => {
   });
 };
 
-export default useAddService;
+export default useAddServiceDetails;

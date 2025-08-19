@@ -1,27 +1,56 @@
-import { useState } from "react";
-import { Form, Input, Button, Typography, Select } from "antd";
+import { useEffect, useState } from "react";
+import { Form, Input, Button, Typography } from "antd";
 import type { UploadFile } from "antd";
 import CustomUpload from "../../components/reuse/CustomUpload";
-import useAddService from "../../hooks/services/useAddService";
 import Loader from "../../components/reuse/Loader";
 import QuillEditor from "../../components/reuse/QuillEditor";
-import { useFetchServices } from "../../hooks/services/useFetchServices";
+import { useLocation, useParams } from "react-router";
+import useUpdateServiceDetails from "../../hooks/serviceDetails/useUpdateServiceDetails";
 
 const { Title } = Typography;
 
-const AddServices = () => {
+const UpdateServiceDetails = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const { data: servicesData } = useFetchServices();
+  const { id } = useParams();
+  const { state } = useLocation();
 
-  const serviceTypes = servicesData?.map((service) => service.type);
+  console.log(state);
+
+  useEffect(() => {
+    if (state?.servicedetails) {
+      const { title, description, images } = state.servicedetails;
+
+      form.setFieldsValue({
+        title_en: title?.en || "",
+        title_ar: title?.ar || "",
+        text_en: description?.en || "",
+        text_ar: description?.ar || "",
+      });
+
+      // Optional: Preload the uploaded image if you have a preview URL
+      if (images) {
+        const initialFileList = [
+          {
+            uid: "-1",
+            name: "existing-image",
+            status: "done",
+            url: images[0]?.image_path,
+          } as UploadFile,
+        ];
+
+        setFileList(initialFileList);
+        form.setFieldsValue({ icon: initialFileList });
+      }
+    }
+  }, [state, form]);
 
   const {
-    mutate: AddServiceMutate,
+    mutate: UpdateServiceDetailsMutate,
     isError,
     error,
     isPending,
-  } = useAddService();
+  } = useUpdateServiceDetails();
 
   const onFinish = (values: any) => {
     const formData = new FormData();
@@ -29,19 +58,21 @@ const AddServices = () => {
     formData.append("title_ar", values.title_ar);
     formData.append("text_en", values.text_en);
     formData.append("text_ar", values.text_ar);
-    formData.append("type", values.type);
 
     if (fileList[0] && fileList[0].originFileObj) {
-      formData.append("icon", fileList[0].originFileObj as File);
+      formData.append("images", fileList[0].originFileObj as File);
     }
 
-    AddServiceMutate({
-      title_en: values.title_en,
-      title_ar: values.title_ar,
-      text_en: values.text_en,
-      text_ar: values.text_ar,
-      type: values.type,
-      icon: fileList[0]?.originFileObj || null,
+    UpdateServiceDetailsMutate({
+      id: Number(id),
+      values: {
+        title_en: values.title_en,
+        title_ar: values.title_ar,
+        description_en: values.text_en,
+        description_ar: values.text_ar,
+        service_id: Number(state.servicedetails.service_id),
+        images: fileList[0]?.originFileObj ? [fileList[0].originFileObj] : null,
+      },
     });
   };
 
@@ -66,13 +97,12 @@ const AddServices = () => {
             </svg>
           </div>
           <Title level={2} className="!text-slate-800 !mb-2">
-            Add New Service
+            Update Service Details
           </Title>
           <p className="text-slate-600">
-            Create a new service with multilingual support
+            update service with multilingual support
           </p>
         </div>
-
         {/* Form */}
         <div className="relative bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/50 overflow-hidden">
           {isPending && (
@@ -168,33 +198,12 @@ const AddServices = () => {
                 </Form.Item>
               </div>
 
-              <Form.Item
-                label={
-                  <span className="text-slate-700 font-medium">
-                    Service Type
-                  </span>
-                }
-                name="type"
-                rules={[
-                  { required: true, message: "Please select a service type" },
-                ]}
-                className="mb-4"
-              >
-                <Select placeholder="Select service type">
-                  {serviceTypes?.map((type: string, index: number) => (
-                    <Select.Option key={index} value={type}>
-                      {type}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-
               {/* Upload */}
               <div className="bg-white rounded-xl p-6 border border-slate-200">
                 <Form.Item
                   label={
                     <span className="text-slate-700 font-medium text-lg">
-                      Service Icon
+                      Service Details Image
                     </span>
                   }
                   name="icon"
@@ -250,7 +259,6 @@ const AddServices = () => {
             </Form>
           </div>
         </div>
-
         {/* Footer Note */}
         <div className="text-center mt-6">
           <p className="text-slate-500 text-sm">
@@ -262,4 +270,4 @@ const AddServices = () => {
   );
 };
 
-export default AddServices;
+export default UpdateServiceDetails;

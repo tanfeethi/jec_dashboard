@@ -3,6 +3,9 @@ import { Navigate, Route, Routes } from "react-router";
 import { Spin } from "antd";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedLayout from "../components/layout/ProtectedLayout";
+import AllServicesDetails from "../pages/ServiceDetails/AllServicesDetails";
+import AddServiceDetails from "../pages/ServiceDetails/AddServiceDetails";
+import UpdateServiceDetails from "../pages/ServiceDetails/UpdateServiceDetails";
 
 // Lazy load all pages
 const Login = lazy(() => import("../pages/login/Login"));
@@ -103,6 +106,17 @@ const AppRouter = () => {
             <Route path="services" element={<AllServices />} />
             <Route path="services/add" element={<AddServices />} />
             <Route path="services/edit/:id" element={<UpdateService />} />
+
+            {/* Services Details */}
+            <Route path="serviceDetails/:id" element={<AllServicesDetails />} />
+            <Route
+              path="addserviceDetails/:service_id"
+              element={<AddServiceDetails />}
+            />
+            <Route
+              path="updateserviceDetails/:id"
+              element={<UpdateServiceDetails />}
+            />
 
             {/* Sliders */}
             <Route path="sliders" element={<AllSliders />} />
