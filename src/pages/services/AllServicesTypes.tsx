@@ -1,15 +1,19 @@
 import { useNavigate } from "react-router";
 import FeaturesContainer from "../../components/reuse/FeaturesContainer";
 import TableComponent from "../../components/reuse/TableComponent";
-import { useFetchServices } from "../../hooks/services/useFetchServices";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-import useDeleteService from "../../hooks/services/useDeleteService";
+import AddServiceTypeModal from "../../components/once/AddServiceTypeModal";
+import { useState } from "react";
+import { useFetchServicesTypes } from "../../hooks/servicesTypes/useServiceTypes";
+import useDeleteServiceTypes from "../../hooks/servicesTypes/useDeleteServiceTypes";
 
-const AllServices = () => {
+const ServicesTypes = () => {
   const navigate = useNavigate();
-  const { data: servicesData, isLoading } = useFetchServices();
+  const { data: servicesTypesData, isLoading } = useFetchServicesTypes();
+  const [open, setOpen] = useState(false);
 
-  const { mutate: DeleteServiceMutate, isPending } = useDeleteService();
+  const { mutate: DeleteServiceTypeMutate, isPending } =
+    useDeleteServiceTypes();
 
   const columns = [
     {
@@ -18,26 +22,17 @@ const AllServices = () => {
       key: "id",
     },
     {
-      title: "Type",
+      title: "Name[en]",
       key: "type",
       render: (_: any, record: any) => (
-        <span className="text-slate-700 font-medium">
-          {record.type_name.en}
-        </span>
+        <span className="text-slate-700 font-medium">{record.name.en}</span>
       ),
     },
     {
-      title: "Title [AR]",
+      title: "Name[ar]",
       key: "titleAr",
       render: (_: any, record: any) => (
-        <span className="text-slate-700 font-medium">{record.title?.ar}</span>
-      ),
-    },
-    {
-      title: "Title [EN]",
-      key: "titleAr",
-      render: (_: any, record: any) => (
-        <span className="text-slate-700 font-medium">{record.title?.en}</span>
+        <span className="text-slate-700 font-medium">{record.name.ar}</span>
       ),
     },
     {
@@ -74,7 +69,7 @@ const AllServices = () => {
 
           {/* Delete Button */}
           <button
-            onClick={() => DeleteServiceMutate(record.id)}
+            onClick={() => DeleteServiceTypeMutate(record.id)}
             className="group relative inline-flex items-center justify-center w-9 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
           >
             <DeleteOutlined className="text-base group-hover:scale-110 transition-transform duration-200" />
@@ -109,22 +104,29 @@ const AllServices = () => {
                   </svg>
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 tracking-tight">
-                  All Services
+                  All Service types
                 </h2>
               </div>
               <button
                 type="button"
                 className=" bg-gradient-to-br from-[var(--mainColor)] to-[var(--secondaryColor)] text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700 transition cursor-pointer"
-                onClick={() => navigate("add")}
+                onClick={() => setOpen(true)}
               >
-                Add Service
+                Add Service type
               </button>
             </div>
             <p className="text-slate-600 text-sm font-medium">
-              Manage and organize your service listings.
+              Manage and organize your service types listings.
             </p>
           </div>
         </div>
+
+        <AddServiceTypeModal
+          open={open}
+          onClose={() => {
+            setOpen(false);
+          }}
+        />
 
         {/* Table Container */}
         <div className="relative">
@@ -132,7 +134,7 @@ const AllServices = () => {
           <div className="relative p-8">
             <TableComponent
               columns={columns}
-              data={servicesData || []}
+              data={servicesTypesData || []}
               loading={isLoading || isPending}
             />
           </div>
@@ -142,4 +144,4 @@ const AllServices = () => {
   );
 };
 
-export default AllServices;
+export default ServicesTypes;

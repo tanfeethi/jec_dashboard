@@ -31,6 +31,11 @@ const Sidebar = () => {
       label: "Home",
     },
     {
+      key: "/services_types",
+      icon: <CustomerServiceOutlined />,
+      label: "Services Types",
+    },
+    {
       key: "/services",
       icon: <CustomerServiceOutlined />,
       label: "Services",

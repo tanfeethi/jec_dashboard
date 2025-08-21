@@ -6,6 +6,7 @@ import ProtectedLayout from "../components/layout/ProtectedLayout";
 import AllServicesDetails from "../pages/ServiceDetails/AllServicesDetails";
 import AddServiceDetails from "../pages/ServiceDetails/AddServiceDetails";
 import UpdateServiceDetails from "../pages/ServiceDetails/UpdateServiceDetails";
+import ServicesTypes from "../pages/services/AllServicesTypes";
 
 // Lazy load all pages
 const Login = lazy(() => import("../pages/login/Login"));
@@ -101,6 +102,9 @@ const AppRouter = () => {
             <Route path="blogs" element={<AllBlogs />} />
             <Route path="blogs/add" element={<AddBlog />} />
             <Route path="blogs/edit/:id" element={<UpdateBlog />} />
+
+            {/* services Types */}
+            <Route path="services_types" element={<ServicesTypes />} />
 
             {/* Services */}
             <Route path="services" element={<AllServices />} />
