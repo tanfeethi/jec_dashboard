@@ -1,16 +1,19 @@
-import { useNavigate } from "react-router";
 import FeaturesContainer from "../../components/reuse/FeaturesContainer";
 import TableComponent from "../../components/reuse/TableComponent";
-import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddServiceTypeModal from "../../components/once/AddServiceTypeModal";
 import { useState } from "react";
 import { useFetchServicesTypes } from "../../hooks/servicesTypes/useServiceTypes";
 import useDeleteServiceTypes from "../../hooks/servicesTypes/useDeleteServiceTypes";
+import UpdateServiceTypeModal from "../../components/once/UpdateServiceTypeModal";
 
 const ServicesTypes = () => {
-  const navigate = useNavigate();
   const { data: servicesTypesData, isLoading } = useFetchServicesTypes();
-  const [open, setOpen] = useState(false);
+  const [addModalopen, setAddModalOpen] = useState(false);
+  const [UpdateModalopen, setUpdateModalOpen] = useState(false);
+  const [selectedServiceType, setSelectedServiceType] = useState<any | null>(
+    null
+  );
 
   const { mutate: DeleteServiceTypeMutate, isPending } =
     useDeleteServiceTypes();
@@ -40,28 +43,12 @@ const ServicesTypes = () => {
       key: "action",
       render: (_: any, record: any) => (
         <div className="flex items-center gap-3">
-          <button
-            onClick={() =>
-              navigate(`/serviceDetails/${record.id}`, {
-                state: { service: record },
-              })
-            }
-            className="group relative inline-flex items-center justify-center w-9  text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-          >
-            <EyeOutlined
-              title="Show Details"
-              className="text-base group-hover:scale-110 transition-transform duration-200 cursor-pointer"
-            />
-          </button>
-
           {/* Edit Button */}
-
           <button
-            onClick={() =>
-              navigate(`/services/edit/${record.id}`, {
-                state: { service: record },
-              })
-            }
+            onClick={() => {
+              setSelectedServiceType(record); // 👈 save row data
+              setUpdateModalOpen(true);
+            }}
             className="group relative inline-flex items-center justify-center w-9  text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
             <EditOutlined className="text-base group-hover:scale-110 transition-transform duration-200" />
@@ -110,7 +97,7 @@ const ServicesTypes = () => {
               <button
                 type="button"
                 className=" bg-gradient-to-br from-[var(--mainColor)] to-[var(--secondaryColor)] text-white text-sm px-4 py-2 rounded-md hover:bg-blue-700 transition cursor-pointer"
-                onClick={() => setOpen(true)}
+                onClick={() => setAddModalOpen(true)}
               >
                 Add Service type
               </button>
@@ -122,10 +109,17 @@ const ServicesTypes = () => {
         </div>
 
         <AddServiceTypeModal
-          open={open}
+          open={addModalopen}
           onClose={() => {
-            setOpen(false);
+            setAddModalOpen(false);
           }}
+        />
+
+        <UpdateServiceTypeModal
+          open={UpdateModalopen}
+          onClose={() => setUpdateModalOpen(false)}
+          // 👇 pass selected data into modal
+          serviceType={selectedServiceType}
         />
 
         {/* Table Container */}

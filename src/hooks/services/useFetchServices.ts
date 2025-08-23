@@ -11,7 +11,7 @@ export interface IServices {
   title: ILocals;
   text: ILocals;
   icon: string;
-  type_name: ILocals;
+  type_name: ILocals | string; // ✅ flexible type (can be object or string)
 }
 
 export interface IServicesResponse {
@@ -24,7 +24,6 @@ export interface IServicesResponse {
 export const getServices = async () => {
   const res = await apiClient.get<IServicesResponse>("/api/dashboard/services");
   console.log(res);
-
   return res.data.data;
 };
 

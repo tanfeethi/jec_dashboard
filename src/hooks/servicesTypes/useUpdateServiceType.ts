@@ -5,12 +5,11 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 export interface AddServicePayload {
-  title_en: string;
-  title_ar: string;
-  text_en: string;
-  text_ar: string;
-  type: string;
-  icon: File | null;
+  id: number;
+  name: {
+    name_en: string;
+    name_ar: string;
+  };
 }
 
 export interface ServiceErrorResponse {
@@ -18,27 +17,23 @@ export interface ServiceErrorResponse {
   error: string;
 }
 
-const createService = async (
+const updateServiceType = async (
   data: AddServicePayload
 ): Promise<{ success: boolean }> => {
   const formData = new FormData();
 
   // Use the exact field names your backend expects
-  formData.append("title[en]", data.title_en);
-  formData.append("title[ar]", data.title_ar);
-  formData.append("text[en]", data.text_en);
-  formData.append("text[ar]", data.text_ar);
-  formData.append("type_id", data.type);
+  formData.append("name[en]", data.name.name_en);
+  formData.append("name[ar]", data.name.name_ar);
 
-  if (data.icon) {
-    formData.append("icon", data.icon);
-  }
-
-  const response = await apiClient.post("/api/dashboard/services", formData);
+  const response = await apiClient.put(
+    `/api/dashboard/types/${data.id}`,
+    formData
+  );
   return response.data;
 };
 
-const useAddService = () => {
+const useUpdateServiceType = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -47,11 +42,11 @@ const useAddService = () => {
     AxiosError<ServiceErrorResponse>,
     AddServicePayload
   >({
-    mutationFn: createService,
+    mutationFn: updateServiceType,
     onSuccess: () => {
       toast.success("Service added successfully", { position: "top-center" });
-      navigate("/services");
-      queryClient.invalidateQueries({ queryKey: ["services"] });
+      navigate("/services_types");
+      queryClient.invalidateQueries({ queryKey: ["services_types"] });
     },
     onError: (error) => {
       console.error(
@@ -62,4 +57,4 @@ const useAddService = () => {
   });
 };
 
-export default useAddService;
+export default useUpdateServiceType;

@@ -5,16 +5,14 @@ import CustomUpload from "../../components/reuse/CustomUpload";
 import useAddService from "../../hooks/services/useAddService";
 import Loader from "../../components/reuse/Loader";
 import QuillEditor from "../../components/reuse/QuillEditor";
-import { useFetchServices } from "../../hooks/services/useFetchServices";
+import { useFetchServicesTypes } from "../../hooks/servicesTypes/useServiceTypes";
 
 const { Title } = Typography;
 
 const AddServices = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const { data: servicesData } = useFetchServices();
-
-  const serviceTypes = servicesData?.map((service) => service.type);
+  const { data: serviceTypes } = useFetchServicesTypes();
 
   const {
     mutate: AddServiceMutate,
@@ -181,9 +179,9 @@ const AddServices = () => {
                 className="mb-4"
               >
                 <Select placeholder="Select service type">
-                  {serviceTypes?.map((type: string, index: number) => (
-                    <Select.Option key={index} value={type}>
-                      {type}
+                  {serviceTypes?.map((type) => (
+                    <Select.Option key={type.id} value={type.id}>
+                      {type.name.en}
                     </Select.Option>
                   ))}
                 </Select>

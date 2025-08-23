@@ -1,7 +1,10 @@
 import { useNavigate } from "react-router";
 import FeaturesContainer from "../../components/reuse/FeaturesContainer";
 import TableComponent from "../../components/reuse/TableComponent";
-import { useFetchServices } from "../../hooks/services/useFetchServices";
+import {
+  useFetchServices,
+  type IServices,
+} from "../../hooks/services/useFetchServices";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import useDeleteService from "../../hooks/services/useDeleteService";
 
@@ -20,38 +23,45 @@ const AllServices = () => {
     {
       title: "Type",
       key: "type",
-      render: (_: any, record: any) => (
+      render: (_: any, record: IServices) => (
         <span className="text-slate-700 font-medium">
-          {record.type_name.en}
+          {typeof record.type_name === "string"
+            ? record.type_name
+            : record.type_name?.en ?? ""}
         </span>
       ),
     },
     {
       title: "Title [AR]",
       key: "titleAr",
-      render: (_: any, record: any) => (
-        <span className="text-slate-700 font-medium">{record.title?.ar}</span>
+      render: (_: any, record: IServices) => (
+        <span className="text-slate-700 font-medium">
+          {record?.title?.ar ?? ""}
+        </span>
       ),
     },
     {
       title: "Title [EN]",
-      key: "titleAr",
-      render: (_: any, record: any) => (
-        <span className="text-slate-700 font-medium">{record.title?.en}</span>
+      key: "titleEn", // ✅ fixed duplicate key
+      render: (_: any, record: IServices) => (
+        <span className="text-slate-700 font-medium">
+          {record?.title?.en ?? ""}
+        </span>
       ),
     },
     {
       title: "Actions",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: any, record: IServices) => (
         <div className="flex items-center gap-3">
+          {/* View Button */}
           <button
             onClick={() =>
               navigate(`/serviceDetails/${record.id}`, {
                 state: { service: record },
               })
             }
-            className="group relative inline-flex items-center justify-center w-9  text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="group relative inline-flex items-center justify-center w-9 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
             <EyeOutlined
               title="Show Details"
@@ -60,21 +70,20 @@ const AllServices = () => {
           </button>
 
           {/* Edit Button */}
-
           <button
             onClick={() =>
               navigate(`/services/edit/${record.id}`, {
                 state: { service: record },
               })
             }
-            className="group relative inline-flex items-center justify-center w-9  text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="group relative inline-flex items-center justify-center w-9 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
             <EditOutlined className="text-base group-hover:scale-110 transition-transform duration-200" />
           </button>
 
           {/* Delete Button */}
           <button
-            onClick={() => DeleteServiceMutate(record.id)}
+            onClick={() => DeleteServiceMutate(record.id)} // ✅ ensure hook accepts `id`
             className="group relative inline-flex items-center justify-center w-9 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
           >
             <DeleteOutlined className="text-base group-hover:scale-110 transition-transform duration-200" />
