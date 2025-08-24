@@ -1,4 +1,4 @@
-import { Modal, Input, Button, Form, Spin } from "antd";
+import { Modal, Input, Button, Form } from "antd";
 import { AiOutlineClose } from "react-icons/ai";
 import useAddServiceType from "../../hooks/servicesTypes/useAddServiceType";
 

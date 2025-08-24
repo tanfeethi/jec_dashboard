@@ -25,8 +25,9 @@ const updateServiceType = async (
   // Use the exact field names your backend expects
   formData.append("name[en]", data.name.name_en);
   formData.append("name[ar]", data.name.name_ar);
+  formData.append("_method", "put");
 
-  const response = await apiClient.put(
+  const response = await apiClient.post(
     `/api/dashboard/types/${data.id}`,
     formData
   );

@@ -6,26 +6,24 @@ import Loader from "../../components/reuse/Loader";
 import { useLocation, useParams } from "react-router";
 import useUpdateService from "../../hooks/services/useUpdateService";
 import QuillEditor from "../../components/reuse/QuillEditor";
-import { useFetchServices } from "../../hooks/services/useFetchServices";
+import { useFetchServicesTypes } from "../../hooks/servicesTypes/useServiceTypes";
 
 const { Title } = Typography;
 
 const UpdateService = () => {
   const { id } = useParams();
   const { state } = useLocation();
-  const { data: servicesData } = useFetchServices();
-
-  const serviceTypes = servicesData?.map((service) => service.type);
+  const { data: serviceTypes } = useFetchServicesTypes();
 
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>(
     state.service?.icon
       ? [
           {
-            uid: "-1", // A unique negative UID for existing files
-            name: "existing-image.png", // Displayed filename
-            status: "done", // Mark as uploaded
-            url: state.service.icon, // URL from backend
+            uid: "-1",
+            name: "existing-image.png",
+            status: "done",
+            url: state.service.icon,
           },
         ]
       : []
@@ -40,17 +38,16 @@ const UpdateService = () => {
 
   useEffect(() => {
     if (state?.service) {
-      const { title, text, icon, type } = state.service;
+      const { title, text, icon, type_name } = state.service;
 
       form.setFieldsValue({
         title_en: title?.en || "",
         title_ar: title?.ar || "",
         text_en: text?.en || "",
         text_ar: text?.ar || "",
-        type: type || "",
+        type: type_name.en || "",
       });
 
-      // Optional: Preload the uploaded image if you have a preview URL
       if (icon) {
         const initialFileList = [
           {
@@ -78,7 +75,7 @@ const UpdateService = () => {
         text_en: values.text_en,
         text_ar: values.text_ar,
         icon: iconFile,
-        type: values.type,
+        type: values.type, // ✅ now sending ID only
       },
     });
   };
@@ -205,6 +202,7 @@ const UpdateService = () => {
                 </Form.Item>
               </div>
 
+              {/* Service Type */}
               <Form.Item
                 label={
                   <span className="text-slate-700 font-medium">
@@ -218,9 +216,9 @@ const UpdateService = () => {
                 className="mb-4"
               >
                 <Select placeholder="Select service type">
-                  {serviceTypes?.map((type: string, index: number) => (
-                    <Select.Option key={index} value={type}>
-                      {type}
+                  {serviceTypes?.map((type) => (
+                    <Select.Option key={type.id} value={type.id}>
+                      {type.name.en}
                     </Select.Option>
                   ))}
                 </Select>
@@ -251,7 +249,7 @@ const UpdateService = () => {
                     fileList={fileList}
                     onChange={({ fileList }) => {
                       setFileList(fileList.slice(-1));
-                      form.setFieldsValue({ icon: fileList }); // Update form value manually
+                      form.setFieldsValue({ icon: fileList });
                     }}
                     maxCount={1}
                     accept="image/*"
