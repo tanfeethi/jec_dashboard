@@ -15,6 +15,7 @@ const CustomUpload: React.FC<CustomUploadProps> = ({ fileList, ...rest }) => {
     <Dragger
       style={{
         background: "#fff",
+        marginBottom: "20px",
       }}
       fileList={fileList}
       showUploadList={true}

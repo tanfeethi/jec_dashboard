@@ -5,17 +5,14 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 // hooks/projects/useUpdateProject.ts
-export interface updateProjectPayload {
+export interface UpdateProjectPayload {
   id: number;
-  title: {
-    en: string;
-    ar: string;
-  };
-  text: {
-    en: string;
-    ar: string;
-  };
-  thumbnail: File[] | null;
+  title_en: string;
+  title_ar: string;
+  text_en: string;
+  text_ar: string;
+  thumbnail: File[] | null; // single or multiple (clarify with backend)
+  images?: File[] | null; // optional (same as add)
 }
 
 export interface ServiceErrorResponse {
@@ -24,43 +21,30 @@ export interface ServiceErrorResponse {
 }
 
 const updateProject = async (
-  data: updateProjectPayload
+  data: UpdateProjectPayload
 ): Promise<{ success: boolean }> => {
-  // If we have a thumbnail file, send FormData
+  const formData = new FormData();
+
+  formData.append("title[en]", data.title_en);
+  formData.append("title[ar]", data.title_ar);
+  formData.append("text[en]", data.text_en);
+  formData.append("text[ar]", data.text_ar);
+
+  // Thumbnail (only 1 allowed)
   if (data.thumbnail?.length) {
-    const formData = new FormData();
-    formData.append("title[en]", data.title.en);
-    formData.append("title[ar]", data.title.ar);
-    formData.append("text[en]", data.text.en);
-    formData.append("text[ar]", data.text.ar);
-
-    const file = data.thumbnail[0];
-    if (file instanceof File) {
-      formData.append("thumbnail[]", file);
-    }
-
-    const response = await apiClient.put(
-      `/api/dashboard/projects/${data.id}`,
-      formData
-    );
-    return response.data;
+    formData.append("thumbnail", data.thumbnail[0]);
   }
 
-  // Otherwise send JSON (matches your Postman request)
-  const jsonPayload = {
-    title: {
-      en: data.title.en,
-      ar: data.title.ar,
-    },
-    text: {
-      en: data.text.en,
-      ar: data.text.ar,
-    },
-  };
+  // Images (if multiple allowed, append all)
+  if (data.images?.length) {
+    data.images.forEach((file) => {
+      formData.append("images[]", file);
+    });
+  }
 
-  const response = await apiClient.put(
-    `/api/dashboard/projects/${data.id}`,
-    jsonPayload
+  const response = await apiClient.post(
+    `/api/dashboard/projects/${data.id}?_method=PUT`,
+    formData
   );
   return response.data;
 };
@@ -72,15 +56,18 @@ const useUpdateProject = () => {
   return useMutation<
     { success: boolean },
     AxiosError<ServiceErrorResponse>,
-    updateProjectPayload
+    UpdateProjectPayload
   >({
     mutationFn: updateProject,
     onSuccess: () => {
       toast.success("Project updated successfully", { position: "top-center" });
-      navigate("/projects");
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      navigate("/projects");
     },
     onError: (error) => {
+      const errorMsg =
+        error.response?.data?.message || "Failed to update project";
+      toast.error(errorMsg, { position: "top-center" });
       console.error(
         "Update Project error:",
         error.response?.data || error.message

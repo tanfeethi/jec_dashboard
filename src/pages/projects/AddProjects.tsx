@@ -10,7 +10,11 @@ const { Title } = Typography;
 
 const AddProjects = () => {
   const [form] = Form.useForm();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  // Separate states
+  const [thumbnailList, setThumbnailList] = useState<UploadFile[]>([]);
+  const [imagesList, setImagesList] = useState<UploadFile[]>([]);
+
   const [textEn, setTextEn] = useState("");
   const [textAr, setTextAr] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -41,13 +45,11 @@ const AddProjects = () => {
       title_ar: values.title_ar,
       text_en: textEn,
       text_ar: textAr,
-      thumbnail: fileList.map((f) => f.originFileObj as File),
+      thumbnail: thumbnailList.map((f) => f.originFileObj as File), // single file
+      images: imagesList.map((f) => f.originFileObj as File), // multiple files
     };
 
-    // Debug log
     console.log("Payload being sent to mutation:", payload);
-
-    // Submit API call through react-query mutation
     AddProjectMutate(payload);
   };
 
@@ -79,7 +81,7 @@ const AddProjects = () => {
             Add New Projects
           </Title>
           <p className="text-slate-600">
-            Create a new projects with multilingual support
+            Create a new project with multilingual support
           </p>
         </div>
 
@@ -129,10 +131,7 @@ const AddProjects = () => {
                   }
                   name="title_ar"
                   rules={[
-                    {
-                      required: true,
-                      message: "Please enter title in Arabic",
-                    },
+                    { required: true, message: "Please enter title in Arabic" },
                   ]}
                   className="!mb-0"
                 >
@@ -186,24 +185,57 @@ const AddProjects = () => {
                 </Form.Item>
               </div>
 
-              {/* Upload */}
+              {/* Thumbnail Upload */}
               <div className="bg-white rounded-xl p-6 border border-slate-200">
                 <Form.Item
                   label={
                     <span className="text-slate-700 font-medium text-lg">
-                      Slider Icon
+                      Project Thumbnail
                     </span>
                   }
-                  name="background"
                   rules={[
-                    { required: true, message: "Please upload an icon image" },
+                    {
+                      required: true,
+                      message: "Please upload a thumbnail image",
+                    },
                   ]}
                   className="!mb-0"
                 >
                   <CustomUpload
-                    fileList={fileList}
-                    onChange={({ fileList }) => setFileList(fileList.slice(-1))}
+                    fileList={thumbnailList}
+                    onChange={({ fileList }) =>
+                      setThumbnailList(fileList.slice(-1))
+                    } // only keep 1
                     maxCount={1}
+                    accept="image/*"
+                  />
+                </Form.Item>
+              </div>
+
+              {/* Images Upload */}
+              <div className="bg-white rounded-xl p-6 border border-slate-200">
+                <Form.Item
+                  label={
+                    <span className="text-slate-700 font-medium text-lg">
+                      Project Images{" "}
+                      <span className="text-[12px] text-green-800">
+                        (multiple allowed)
+                      </span>
+                    </span>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please upload at least one image",
+                    },
+                  ]}
+                  className="!mb-0"
+                >
+                  <CustomUpload
+                    listType="picture-card"
+                    fileList={imagesList}
+                    onChange={({ fileList }) => setImagesList(fileList)}
+                    multiple
                     accept="image/*"
                   />
                 </Form.Item>

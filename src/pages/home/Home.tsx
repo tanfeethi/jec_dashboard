@@ -1,4 +1,8 @@
+import { useFetchBlogs } from "../../hooks/blogs/useFetchBlogs";
+
 const Home = () => {
+  const { data } = useFetchBlogs(1);
+
   return (
     <div className=" bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col xl:h-screen">
       {/* Main Content */}

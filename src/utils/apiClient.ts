@@ -26,8 +26,8 @@ apiClient.interceptors.response.use(
     if (error.response) {
       // Server responded with a status
       if (error.response.status === 401) {
-        // const logout = useAuthStore.getState().logout;
-        // logout();
+        const logout = useAuthStore.getState().logout;
+        logout();
       }
     } else if (error.request) {
       // Request was made but no response — likely CORS issue

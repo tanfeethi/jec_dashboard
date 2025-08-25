@@ -12,10 +12,9 @@ const { Title } = Typography;
 const UpdateProject = () => {
   const { id } = useParams();
   const { state } = useLocation();
-  console.log(state?.project);
-
   const [form] = Form.useForm();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileListThumbnail, setFileListThumbnail] = useState<UploadFile[]>([]);
+  const [fileListImages, setFileListImages] = useState<UploadFile[]>([]);
   const [textEn, setTextEn] = useState("");
   const [textAr, setTextAr] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -43,16 +42,15 @@ const UpdateProject = () => {
 
     const payload = {
       id: Number(id),
-      title: {
-        en: values.title_en,
-        ar: values.title_ar,
-      },
-      text: {
-        en: textEn,
-        ar: textAr,
-      },
-      thumbnail: fileList.length
-        ? fileList.map((f) => f.originFileObj as File)
+      title_en: values.title_en,
+      title_ar: values.title_ar,
+      text_en: textEn,
+      text_ar: textAr,
+      thumbnail: fileListThumbnail.length
+        ? fileListThumbnail.map((f) => f.originFileObj as File)
+        : null,
+      images: fileListImages.length
+        ? fileListImages.map((f) => f.originFileObj as File)
         : null,
     };
 
@@ -60,37 +58,47 @@ const UpdateProject = () => {
     UpdateProjectMutate(payload);
   };
 
-  const onFinishFailed = () => {
-    setSubmitted(true);
-  };
+  const onFinishFailed = () => setSubmitted(true);
 
-  // 🆕 Pre-fill form and fields when editing
+  // Pre-fill form when editing
   useEffect(() => {
     if (state?.project) {
-      const { title, text, background } = state.project;
+      const { title, text, thumbnail, images } = state.project;
 
-      // Set text editors
-      setTextEn(text?.en|| "");
+      // set text editors
+      setTextEn(text?.en || "");
       setTextAr(text?.ar || "");
 
-      // Set form fields
+      // set titles
       form.setFieldsValue({
         title_en: title?.en || "",
         title_ar: title?.ar || "",
       });
 
-      // Preload uploaded image
-      if (background) {
-        const initialFileList = [
+      // preload thumbnail
+      if (thumbnail) {
+        const initialThumbnail: UploadFile[] = [
           {
-            uid: "-1",
-            name: "existing-image.jpg",
+            uid: "-1", // unique negative id
+            name: "thumbnail.jpg",
             status: "done",
-            url: background,
-          } as UploadFile,
+            url: thumbnail, // make sure this is a valid image URL
+          },
         ];
-        setFileList(initialFileList);
-        form.setFieldsValue({ background: initialFileList });
+        setFileListThumbnail(initialThumbnail);
+        form.setFieldsValue({ thumbnail: initialThumbnail });
+      }
+
+      // preload images
+      if (images && Array.isArray(images) && images.length > 0) {
+        const initialImages: UploadFile[] = images.map((url, index) => ({
+          uid: String(-index - 1),
+          name: `existing-image-${index + 1}.jpg`,
+          status: "done",
+          url,
+        }));
+        setFileListImages(initialImages);
+        form.setFieldsValue({ images: initialImages });
       }
     }
   }, [state, form]);
@@ -223,25 +231,46 @@ const UpdateProject = () => {
                 </Form.Item>
               </div>
 
-              {/* Upload */}
+              {/* Thumbnail Upload */}
               <div className="bg-white rounded-xl p-6 border border-slate-200">
                 <Form.Item
                   label={
                     <span className="text-slate-700 font-medium text-lg">
-                      Slider Icon
+                      Thumbnail Image
                     </span>
                   }
-                  name="background"
-                  rules={[
-                    { required: false, message: "Please upload an icon image" },
-                  ]}
+                  name="thumbnail"
                   className="!mb-0"
                 >
                   <CustomUpload
-                    fileList={fileList}
-                    onChange={({ fileList }) => setFileList(fileList.slice(-1))}
+                    fileList={fileListThumbnail}
+                    onChange={({ fileList }) =>
+                      setFileListThumbnail(fileList.slice(-1))
+                    }
                     maxCount={1}
                     accept="image/*"
+                  />
+                </Form.Item>
+              </div>
+
+              {/* Project Images Upload */}
+              <div className="bg-white rounded-xl p-6 border border-slate-200">
+                <Form.Item
+                  label={
+                    <span className="text-slate-700 font-medium text-lg">
+                      Project Images
+                    </span>
+                  }
+                  name="images"
+                  className="!mb-0"
+                >
+                  <CustomUpload
+                    listType="picture-card"
+                    fileList={fileListImages}
+                    onChange={({ fileList }) => setFileListImages(fileList)}
+                    maxCount={5} // or whatever limit you want
+                    accept="image/*"
+                    multiple
                   />
                 </Form.Item>
               </div>
@@ -262,22 +291,7 @@ const UpdateProject = () => {
                     size="large"
                     className="!w-full !h-12 !rounded-lg !bg-gradient-to-br from-[var(--mainColor)] to-[var(--secondaryColor)] text-white text-sm px-4 py-2 hover:!bg-blue-700 transition cursor-pointer"
                   >
-                    <span className="flex items-center justify-center gap-2">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      Update Project
-                    </span>
+                    Update Project
                   </Button>
                 </Form.Item>
               </div>

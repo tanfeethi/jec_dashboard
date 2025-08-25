@@ -16,18 +16,11 @@ const UpdateService = () => {
   const { data: serviceTypes } = useFetchServicesTypes();
 
   const [form] = Form.useForm();
-  const [fileList, setFileList] = useState<UploadFile[]>(
-    state.service?.icon
-      ? [
-          {
-            uid: "-1",
-            name: "existing-image.png",
-            status: "done",
-            url: state.service.icon,
-          },
-        ]
-      : []
-  );
+
+  // Local state for file list and Quill editors
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [textEn, setTextEn] = useState("");
+  const [textAr, setTextAr] = useState("");
 
   const {
     mutate: updateServiceMutate,
@@ -36,46 +29,54 @@ const UpdateService = () => {
     error,
   } = useUpdateService();
 
+  // Initialize form & state when service data is available
   useEffect(() => {
     if (state?.service) {
-      const { title, text, icon, type_name } = state.service;
+      const { title, text, icon, type_id } = state.service;
 
       form.setFieldsValue({
         title_en: title?.en || "",
         title_ar: title?.ar || "",
-        text_en: text?.en || "",
-        text_ar: text?.ar || "",
-        type: type_name.en || "",
+        type: type_id || null,
       });
 
+      setTextEn(text?.en || "");
+      setTextAr(text?.ar || "");
+
       if (icon) {
-        const initialFileList = [
+        setFileList([
           {
             uid: "-1",
             name: "existing-image.jpg",
             status: "done",
             url: icon,
-          } as UploadFile,
-        ];
-
-        setFileList(initialFileList);
-        form.setFieldsValue({ icon: initialFileList });
+          },
+        ]);
       }
     }
   }, [state, form]);
 
   const onFinish = (values: any) => {
-    const iconFile = fileList[0]?.originFileObj || null;
+    let iconFile: File | undefined = undefined;
+
+    if (fileList.length > 0) {
+      // If it's a new upload, use originFileObj
+      if (fileList[0].originFileObj) {
+        iconFile = fileList[0].originFileObj;
+      }
+      // If it's an existing image (URL), don't send it, API already has it
+      // So iconFile remains undefined
+    }
 
     updateServiceMutate({
       id: Number(id),
       values: {
         title_en: values.title_en,
         title_ar: values.title_ar,
-        text_en: values.text_en,
-        text_ar: values.text_ar,
-        icon: iconFile,
-        type: values.type, // ✅ now sending ID only
+        text_en: textEn,
+        text_ar: textAr,
+        icon: iconFile, // ✅ now always File | undefined
+        type: values.type,
       },
     });
   };
@@ -104,9 +105,10 @@ const UpdateService = () => {
             Update Service
           </Title>
           <p className="text-slate-600">
-            update service with multilingual support
+            Update service with multilingual support
           </p>
         </div>
+
         {/* Form */}
         <div className="relative bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200/50 overflow-hidden">
           {isPending && (
@@ -114,6 +116,7 @@ const UpdateService = () => {
               <Loader />
             </div>
           )}
+
           <div className="p-8">
             <Form
               form={form}
@@ -121,7 +124,7 @@ const UpdateService = () => {
               onFinish={onFinish}
               className="space-y-6"
             >
-              {/* Title Fields */}
+              {/* Titles */}
               <div className="grid md:grid-cols-2 gap-6">
                 <Form.Item
                   label={
@@ -163,7 +166,7 @@ const UpdateService = () => {
                 </Form.Item>
               </div>
 
-              {/* Text Fields */}
+              {/* Texts */}
               <div className="grid md:grid-cols-2 gap-6">
                 <Form.Item
                   label={
@@ -171,16 +174,12 @@ const UpdateService = () => {
                       Description (English)
                     </span>
                   }
-                  name="text_en"
+                  className="!mb-0"
                   rules={[
                     { required: true, message: "Please enter text in English" },
                   ]}
-                  className="!mb-0"
                 >
-                  <QuillEditor
-                    value={form.getFieldValue("text_en")}
-                    onChange={(val) => form.setFieldsValue({ text_en: val })}
-                  />
+                  <QuillEditor value={textEn} onChange={setTextEn} />
                 </Form.Item>
 
                 <Form.Item
@@ -189,16 +188,12 @@ const UpdateService = () => {
                       Description (Arabic)
                     </span>
                   }
-                  name="text_ar"
+                  className="!mb-0"
                   rules={[
                     { required: true, message: "Please enter text in Arabic" },
                   ]}
-                  className="!mb-0"
                 >
-                  <QuillEditor
-                    value={form.getFieldValue("text_ar")}
-                    onChange={(val) => form.setFieldsValue({ text_ar: val })}
-                  />
+                  <QuillEditor value={textAr} onChange={setTextAr} />
                 </Form.Item>
               </div>
 
@@ -232,38 +227,28 @@ const UpdateService = () => {
                       Service Icon
                     </span>
                   }
-                  name="icon"
                   rules={[
                     { required: true, message: "Please upload an icon image" },
                   ]}
-                  valuePropName="fileList"
-                  getValueFromEvent={(e) => {
-                    if (Array.isArray(e)) {
-                      return e;
-                    }
-                    return e?.fileList;
-                  }}
-                  className="!mb-0"
                 >
                   <CustomUpload
+                    listType="picture-card"
                     fileList={fileList}
-                    onChange={({ fileList }) => {
-                      setFileList(fileList.slice(-1));
-                      form.setFieldsValue({ icon: fileList });
-                    }}
+                    onChange={({ fileList }) => setFileList(fileList.slice(-1))}
                     maxCount={1}
                     accept="image/*"
                   />
                 </Form.Item>
               </div>
 
+              {/* Error */}
               {isError && (
                 <div className="bg-red-200 text-center p-3 rounded-sm text-red-900 font-semibold">
                   {error?.response?.data.error || "Network Error"}
                 </div>
               )}
 
-              {/* Submit Button */}
+              {/* Submit */}
               <div className="pt-6 border-t border-slate-200">
                 <Form.Item className="!mb-0">
                   <Button
@@ -273,29 +258,15 @@ const UpdateService = () => {
                     size="large"
                     className="!w-full !h-12 !rounded-lg !bg-gradient-to-br from-[var(--mainColor)] to-[var(--secondaryColor)] text-white text-sm px-4 py-2 hover:!bg-blue-700 transition cursor-pointer"
                   >
-                    <span className="flex items-center justify-center gap-2">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      Update Service
-                    </span>
+                    Update Service
                   </Button>
                 </Form.Item>
               </div>
             </Form>
           </div>
         </div>
-        {/* Footer Note */}
+
+        {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-slate-500 text-sm">
             Make sure all fields are filled correctly before submitting
