@@ -268,7 +268,7 @@ const UpdateProject = () => {
                     listType="picture-card"
                     fileList={fileListImages}
                     onChange={({ fileList }) => setFileListImages(fileList)}
-                    maxCount={5} // or whatever limit you want
+                    maxCount={8} // or whatever limit you want
                     accept="image/*"
                     multiple
                   />
